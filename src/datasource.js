@@ -53,6 +53,8 @@ export class DataDogDatasource {
   }
 
   metricFindQuery(query) {
+    console.log ("inside metricFindQuery()");
+    console.log ("query: " + query);
     if (query === 'tag') {
       return this.tagFindQuery();
     }
@@ -68,7 +70,8 @@ export class DataDogDatasource {
     var d = new Date();
     d.setDate(d.getDate() - 1);
     var from = Math.floor(d.getTime() / 1000);
-
+    console.log("query inside metricFindQuery: " + query);
+    console.log("this.fetching: " +this.fetching);
     this.fetching = this.getMetrics(from).then(metrics => {
       this._cached_metrics = _.map(metrics, metric => {
         return {
@@ -216,6 +219,7 @@ export class DataDogDatasource {
   }
 
   getMetrics(timeFrom) {
+    console.log("inside getMetrics(timeFrom)");
     let params = {};
 
     if (timeFrom) {

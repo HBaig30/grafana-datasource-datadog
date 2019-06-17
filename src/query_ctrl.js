@@ -24,7 +24,6 @@ export class DataDogQueryCtrl extends QueryCtrl {
         custom: false,
       });
     }
-
     if (this.target.metric) {
       this.metricSegment = new uiSegmentSrv.newSegment(
         this.target.metric
@@ -66,6 +65,7 @@ export class DataDogQueryCtrl extends QueryCtrl {
   }
 
   getMetrics() {
+    console.log("inside getMetrics()");
     return this.datasource.metricFindQuery()
     .then(this.uiSegmentSrv.transformToSegments(true));
   }
@@ -106,11 +106,16 @@ export class DataDogQueryCtrl extends QueryCtrl {
   }
 
   metricChanged() {
+    console.log("inside metricChanged()");
     this.target.metric = this.metricSegment.value;
+    console.log("this.metric.value.length: " + this.metricSegment.value.length);
+    if(this.metricSegment.value.length > 4) {
     this.panelCtrl.refresh();
+    }
   }
 
   asChanged() {
+
     if (this.asSegment.value === 'None') {
       this.target.as = null;
     } else {
@@ -132,7 +137,6 @@ export class DataDogQueryCtrl extends QueryCtrl {
     if (this.error) {
       return;
     }
-
     this.panelCtrl.refresh();
   }
 
