@@ -14,6 +14,7 @@ export class DataDogDatasource {
     this.backendSrv = backendSrv;
     this.templateSrv = templateSrv;
     this._cached_metrics = false;
+    this.has_begun = false;
   }
 
   // Function to check Datasource health
@@ -41,6 +42,7 @@ export class DataDogDatasource {
   }
 
   tagFindQuery() {
+    console.log("inside tagFindQuery()");
     return this.getTagsFromCache()
     .then(tags => {
       return _.map(tags, (hosts, tag) => {
@@ -53,40 +55,53 @@ export class DataDogDatasource {
   }
 
   metricFindQuery(query) {
-    console.log ("inside metricFindQuery()");
-    console.log ("query: " + query);
-    if (query === 'tag') {
-      return this.tagFindQuery();
-    }
+    console.log ("inside metricFindQuery(). query: " + query);
 
-    if (this._cached_metrics) {
-      return Promise.resolve(this._cached_metrics);
-    }
+    //console.log("query inside metricFindQuery: " + query);
+    //console.log("newTEST::::::" + this.fetching);
 
-    if (this.fetching) {
-      return this.fetching;
-    }
+   // var has_begun = false;
+    //export {has_begun};
 
-    var d = new Date();
-    d.setDate(d.getDate() - 1);
-    var from = Math.floor(d.getTime() / 1000);
-    console.log("query inside metricFindQuery: " + query);
-    console.log("this.fetching: " +this.fetching);
-    this.fetching = this.getMetrics(from).then(metrics => {
-      this._cached_metrics = _.map(metrics, metric => {
-        return {
-          text: metric,
-          value: metric,
-        };
+    if(this.has_begun === false) {
+      this.has_begun = true;
+
+      return 69;
+    }
+    //console.log("this.has_begun:  " + this.has_begun);
+
+    if(this.has_begun === true) {
+      if (query === 'tag') {
+        return this.tagFindQuery();
+      }
+
+      if (this._cached_metrics) {
+        return Promise.resolve(this._cached_metrics);
+      }
+
+      if (this.fetching) {
+        return this.fetching;
+      }
+      var d = new Date();
+      d.setDate(d.getDate() - 1);
+      var from = Math.floor(d.getTime() / 1000);
+      this.fetching = this.getMetrics(from).then(metrics => {
+        this._cached_metrics = _.map(metrics, metric => {
+          //console.log("this.fetching: " +this.fetching[0]);
+          return {
+            text: metric,
+            value: metric,
+          };
+        });
+        //this._cached_metrics = this._cached_metrics.slice(0,10);
+        return this._cached_metrics;
       });
-
-      return this._cached_metrics;
-    });
-
+    }
     return this.fetching;
   }
 
   getTagKeys() {
+    console.log("inside getTagKeys()");
     return this.getTagsFromCache()
     .then(tagsHosts => {
       let tags = Object.keys(tagsHosts);
@@ -103,6 +118,7 @@ export class DataDogDatasource {
   }
 
   getTagValues(options) {
+    console.log("inside getTagValues()");
     return this.getTagsFromCache()
     .then(tagsHosts => {
       let tags = Object.keys(tagsHosts);
@@ -118,6 +134,7 @@ export class DataDogDatasource {
   }
 
   query(options) {
+    console.log("inside query()");
     var from = Math.floor(options.range.from.valueOf() / 1000);
     var to = Math.floor(options.range.to.valueOf() / 1000);
 
@@ -166,6 +183,7 @@ export class DataDogDatasource {
   }
 
   annotationQuery(options) {
+    console.log("annotationQuery");
     let timeFrom = Math.floor(options.range.from.valueOf() / 1000);
     let timeTo = Math.floor(options.range.to.valueOf() / 1000);
     let {priority, sources, tags} = options.annotation;
@@ -199,12 +217,14 @@ export class DataDogDatasource {
   }
 
   getHosts() {
+    console.log("inside getHosts()");
     return this.searchEntities('hosts');
   }
 
   // entity should be 'hosts' or 'metrics'
   // http://docs.datadoghq.com/api/?lang=console#search
   searchEntities(entity) {
+    console.log("inside searchEntities()");
     let params = {q: ''};
     if (entity) {
       params.q = `${entity}:`;
@@ -237,6 +257,7 @@ export class DataDogDatasource {
   }
 
   getTagsHosts() {
+    console.log("insideTagHosts");
     return this.invokeDataDogApiRequest('/tags/hosts')
     .then(result => {
       if (result && result.tags) {
@@ -246,6 +267,7 @@ export class DataDogDatasource {
   }
 
   getTagsFromCache() {
+    console.log("inside getTagsFromCache");
     let getTags;
     if (this._cached_tags && this._cached_tags.length) {
       getTags = Promise.resolve(this._cached_tags);
@@ -260,6 +282,7 @@ export class DataDogDatasource {
   }
 
   getEventStream(timeFrom, timeTo, priority, sources, tags) {
+    console.log("inside getEventStream()");
     let params = {
       start: timeFrom,
       end: timeTo
@@ -285,6 +308,7 @@ export class DataDogDatasource {
   }
 
   invokeDataDogApiRequest(url, params = {}) {
+    console.log("inside invokeDataDogApiRequest");
     // Set auth params
     params.api_key = this.api_key;
     params.application_key = this.application_key;
@@ -320,6 +344,7 @@ export class DataDogDatasource {
  * [region:east, region:nw] => {region: [east, nw]}
  */
 function mapTagsToKVPairs(tags) {
+  console.log("inside mapTagsToKVPairs");
   let kv_tags = _.filter(tags, tag => {
     return (tag.indexOf(':') !== -1);
   });
@@ -348,6 +373,7 @@ function mapTagsToKVPairs(tags) {
  * http://docs.datadoghq.com/guides/markdown/
  */
 function convertDataDogMdToHtml(str) {
+  console.log("inside convertDataDogMdToHtml");
   const MD_START = '%%%\n';
   const MD_END = '\n%%%';
 

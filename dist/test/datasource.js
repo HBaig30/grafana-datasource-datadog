@@ -38,6 +38,7 @@ var DataDogDatasource = exports.DataDogDatasource = function () {
     this.backendSrv = backendSrv;
     this.templateSrv = templateSrv;
     this._cached_metrics = false;
+    this.has_begun = false;
   }
 
   // Function to check Datasource health
@@ -68,6 +69,7 @@ var DataDogDatasource = exports.DataDogDatasource = function () {
   }, {
     key: 'tagFindQuery',
     value: function tagFindQuery() {
+      console.log("inside tagFindQuery()");
       return this.getTagsFromCache().then(function (tags) {
         return _lodash2.default.map(tags, function (hosts, tag) {
           return {
@@ -82,38 +84,54 @@ var DataDogDatasource = exports.DataDogDatasource = function () {
     value: function metricFindQuery(query) {
       var _this = this;
 
-      if (query === 'tag') {
-        return this.tagFindQuery();
+      console.log("inside metricFindQuery(). query: " + query);
+
+      //console.log("query inside metricFindQuery: " + query);
+      //console.log("newTEST::::::" + this.fetching);
+
+      // var has_begun = false;
+      //export {has_begun};
+
+      if (this.has_begun === false) {
+        this.has_begun = true;
+
+        return 69;
       }
+      //console.log("this.has_begun:  " + this.has_begun);
 
-      if (this._cached_metrics) {
-        return Promise.resolve(this._cached_metrics);
-      }
+      if (this.has_begun === true) {
+        if (query === 'tag') {
+          return this.tagFindQuery();
+        }
 
-      if (this.fetching) {
-        return this.fetching;
-      }
+        if (this._cached_metrics) {
+          return Promise.resolve(this._cached_metrics);
+        }
 
-      var d = new Date();
-      d.setDate(d.getDate() - 1);
-      var from = Math.floor(d.getTime() / 1000);
-
-      this.fetching = this.getMetrics(from).then(function (metrics) {
-        _this._cached_metrics = _lodash2.default.map(metrics, function (metric) {
-          return {
-            text: metric,
-            value: metric
-          };
+        if (this.fetching) {
+          return this.fetching;
+        }
+        var d = new Date();
+        d.setDate(d.getDate() - 1);
+        var from = Math.floor(d.getTime() / 1000);
+        this.fetching = this.getMetrics(from).then(function (metrics) {
+          _this._cached_metrics = _lodash2.default.map(metrics, function (metric) {
+            //console.log("this.fetching: " +this.fetching[0]);
+            return {
+              text: metric,
+              value: metric
+            };
+          });
+          //this._cached_metrics = this._cached_metrics.slice(0,10);
+          return _this._cached_metrics;
         });
-
-        return _this._cached_metrics;
-      });
-
+      }
       return this.fetching;
     }
   }, {
     key: 'getTagKeys',
     value: function getTagKeys() {
+      console.log("inside getTagKeys()");
       return this.getTagsFromCache().then(function (tagsHosts) {
         var tags = Object.keys(tagsHosts);
         var kv = mapTagsToKVPairs(tags);
@@ -130,6 +148,7 @@ var DataDogDatasource = exports.DataDogDatasource = function () {
   }, {
     key: 'getTagValues',
     value: function getTagValues(options) {
+      console.log("inside getTagValues()");
       return this.getTagsFromCache().then(function (tagsHosts) {
         var tags = Object.keys(tagsHosts);
         var kv = mapTagsToKVPairs(tags);
@@ -145,6 +164,7 @@ var DataDogDatasource = exports.DataDogDatasource = function () {
   }, {
     key: 'query',
     value: function query(options) {
+      console.log("inside query()");
       var from = Math.floor(options.range.from.valueOf() / 1000);
       var to = Math.floor(options.range.to.valueOf() / 1000);
 
@@ -195,6 +215,7 @@ var DataDogDatasource = exports.DataDogDatasource = function () {
   }, {
     key: 'annotationQuery',
     value: function annotationQuery(options) {
+      console.log("annotationQuery");
       var timeFrom = Math.floor(options.range.from.valueOf() / 1000);
       var timeTo = Math.floor(options.range.to.valueOf() / 1000);
       var _options$annotation = options.annotation,
@@ -232,6 +253,7 @@ var DataDogDatasource = exports.DataDogDatasource = function () {
   }, {
     key: 'getHosts',
     value: function getHosts() {
+      console.log("inside getHosts()");
       return this.searchEntities('hosts');
     }
 
@@ -241,6 +263,7 @@ var DataDogDatasource = exports.DataDogDatasource = function () {
   }, {
     key: 'searchEntities',
     value: function searchEntities(entity) {
+      console.log("inside searchEntities()");
       var params = { q: '' };
       if (entity) {
         params.q = entity + ':';
@@ -255,6 +278,7 @@ var DataDogDatasource = exports.DataDogDatasource = function () {
   }, {
     key: 'getMetrics',
     value: function getMetrics(timeFrom) {
+      console.log("inside getMetrics(timeFrom)");
       var params = {};
 
       if (timeFrom) {
@@ -272,6 +296,7 @@ var DataDogDatasource = exports.DataDogDatasource = function () {
   }, {
     key: 'getTagsHosts',
     value: function getTagsHosts() {
+      console.log("insideTagHosts");
       return this.invokeDataDogApiRequest('/tags/hosts').then(function (result) {
         if (result && result.tags) {
           return result.tags;
@@ -283,6 +308,7 @@ var DataDogDatasource = exports.DataDogDatasource = function () {
     value: function getTagsFromCache() {
       var _this2 = this;
 
+      console.log("inside getTagsFromCache");
       var getTags = void 0;
       if (this._cached_tags && this._cached_tags.length) {
         getTags = Promise.resolve(this._cached_tags);
@@ -298,6 +324,7 @@ var DataDogDatasource = exports.DataDogDatasource = function () {
   }, {
     key: 'getEventStream',
     value: function getEventStream(timeFrom, timeTo, priority, sources, tags) {
+      console.log("inside getEventStream()");
       var params = {
         start: timeFrom,
         end: timeTo
@@ -325,6 +352,7 @@ var DataDogDatasource = exports.DataDogDatasource = function () {
     value: function invokeDataDogApiRequest(url) {
       var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
+      console.log("inside invokeDataDogApiRequest");
       // Set auth params
       params.api_key = this.api_key;
       params.application_key = this.application_key;
@@ -363,6 +391,7 @@ var DataDogDatasource = exports.DataDogDatasource = function () {
 
 
 function mapTagsToKVPairs(tags) {
+  console.log("inside mapTagsToKVPairs");
   var kv_tags = _lodash2.default.filter(tags, function (tag) {
     return tag.indexOf(':') !== -1;
   });
@@ -391,6 +420,7 @@ function mapTagsToKVPairs(tags) {
  * http://docs.datadoghq.com/guides/markdown/
  */
 function convertDataDogMdToHtml(str) {
+  console.log("inside convertDataDogMdToHtml");
   var MD_START = '%%%\n';
   var MD_END = '\n%%%';
 

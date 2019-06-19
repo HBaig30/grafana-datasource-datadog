@@ -35,6 +35,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+//import {has_begun} from './datasource.js'
+
 var DataDogQueryCtrl = exports.DataDogQueryCtrl = function (_QueryCtrl) {
   _inherits(DataDogQueryCtrl, _QueryCtrl);
 
@@ -56,7 +58,6 @@ var DataDogQueryCtrl = exports.DataDogQueryCtrl = function (_QueryCtrl) {
         custom: false
       });
     }
-
     if (_this.target.metric) {
       _this.metricSegment = new uiSegmentSrv.newSegment(_this.target.metric);
     } else {
@@ -100,7 +101,15 @@ var DataDogQueryCtrl = exports.DataDogQueryCtrl = function (_QueryCtrl) {
   }, {
     key: 'getMetrics',
     value: function getMetrics() {
-      return this.datasource.metricFindQuery().then(this.uiSegmentSrv.transformToSegments(true));
+
+      //console.log("TEST::::: " + this.datasource.metricFindQuery());
+      if (this.datasource.metricFindQuery() == 69) {
+        console.log("INSIDE IF STATEMENT");
+        //has_begun = false;
+        return;
+      } else {
+        return this.datasource.metricFindQuery().then(this.uiSegmentSrv.transformToSegments(true));
+      }
     }
   }, {
     key: 'getAggregations',
@@ -135,12 +144,15 @@ var DataDogQueryCtrl = exports.DataDogQueryCtrl = function (_QueryCtrl) {
   }, {
     key: 'metricChanged',
     value: function metricChanged() {
+      console.log("inside metricChanged()");
       this.target.metric = this.metricSegment.value;
+      //console.log("this.metric.value.length: " + this.metricSegment.value.length);
       this.panelCtrl.refresh();
     }
   }, {
     key: 'asChanged',
     value: function asChanged() {
+
       if (this.asSegment.value === 'None') {
         this.target.as = null;
       } else {
@@ -164,7 +176,6 @@ var DataDogQueryCtrl = exports.DataDogQueryCtrl = function (_QueryCtrl) {
       if (this.error) {
         return;
       }
-
       this.panelCtrl.refresh();
     }
   }, {

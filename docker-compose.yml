@@ -2,6 +2,6 @@ grafana:
   image: grafana/grafana:latest
   container_name: grafana
   ports:
-    - "3000:3000"
+    - "9000:3000"
   volumes:
     - ./dist:/var/lib/grafana/plugins/datadog-datasource

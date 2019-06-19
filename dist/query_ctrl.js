@@ -85,7 +85,6 @@ System.register(['lodash', './dfunc', 'app/plugins/sdk', './func_editor', './add
               custom: false
             });
           }
-
           if (_this.target.metric) {
             _this.metricSegment = new uiSegmentSrv.newSegment(_this.target.metric);
           } else {
@@ -129,7 +128,15 @@ System.register(['lodash', './dfunc', 'app/plugins/sdk', './func_editor', './add
         }, {
           key: 'getMetrics',
           value: function getMetrics() {
-            return this.datasource.metricFindQuery().then(this.uiSegmentSrv.transformToSegments(true));
+
+            //console.log("TEST::::: " + this.datasource.metricFindQuery());
+            if (this.datasource.metricFindQuery() == 69) {
+              console.log("INSIDE IF STATEMENT");
+              //has_begun = false;
+              return;
+            } else {
+              return this.datasource.metricFindQuery().then(this.uiSegmentSrv.transformToSegments(true));
+            }
           }
         }, {
           key: 'getAggregations',
@@ -164,12 +171,15 @@ System.register(['lodash', './dfunc', 'app/plugins/sdk', './func_editor', './add
         }, {
           key: 'metricChanged',
           value: function metricChanged() {
+            console.log("inside metricChanged()");
             this.target.metric = this.metricSegment.value;
+            //console.log("this.metric.value.length: " + this.metricSegment.value.length);
             this.panelCtrl.refresh();
           }
         }, {
           key: 'asChanged',
           value: function asChanged() {
+
             if (this.asSegment.value === 'None') {
               this.target.as = null;
             } else {
@@ -193,7 +203,6 @@ System.register(['lodash', './dfunc', 'app/plugins/sdk', './func_editor', './add
             if (this.error) {
               return;
             }
-
             this.panelCtrl.refresh();
           }
         }, {
