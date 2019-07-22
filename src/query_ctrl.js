@@ -4,7 +4,7 @@ import {QueryCtrl} from 'app/plugins/sdk';
 import './func_editor';
 import './add_datadog_func';
 import * as queryBuilder from './query_builder';
-//import {has_begun} from './datasource.js'
+//import {has_begun_global} from './datasource.js'
 
 export class DataDogQueryCtrl extends QueryCtrl {
 
@@ -68,9 +68,8 @@ export class DataDogQueryCtrl extends QueryCtrl {
   getMetrics() {
 
     //console.log("TEST::::: " + this.datasource.metricFindQuery());
-    if(this.datasource.metricFindQuery() == 69) {
-      console.log("INSIDE IF STATEMENT");
-      //has_begun = false;
+
+    if(this.datasource.metricFindQuery() == 69 || this.datasource.metricFindQuery() == 70) {
       return;
     }
     else{
@@ -130,6 +129,11 @@ export class DataDogQueryCtrl extends QueryCtrl {
       this.target.as = this.asSegment.value;
     }
     this.panelCtrl.refresh();
+  }
+
+  groupBy() {
+    console.log("hello world lol");
+
   }
 
   fixTagSegments() {

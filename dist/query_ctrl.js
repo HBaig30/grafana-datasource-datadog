@@ -130,9 +130,8 @@ System.register(['lodash', './dfunc', 'app/plugins/sdk', './func_editor', './add
           value: function getMetrics() {
 
             //console.log("TEST::::: " + this.datasource.metricFindQuery());
-            if (this.datasource.metricFindQuery() == 69) {
-              console.log("INSIDE IF STATEMENT");
-              //has_begun = false;
+
+            if (this.datasource.metricFindQuery() == 69 || this.datasource.metricFindQuery() == 70) {
               return;
             } else {
               return this.datasource.metricFindQuery().then(this.uiSegmentSrv.transformToSegments(true));
@@ -186,6 +185,11 @@ System.register(['lodash', './dfunc', 'app/plugins/sdk', './func_editor', './add
               this.target.as = this.asSegment.value;
             }
             this.panelCtrl.refresh();
+          }
+        }, {
+          key: 'groupBy',
+          value: function groupBy() {
+            console.log("hello world lol");
           }
         }, {
           key: 'fixTagSegments',

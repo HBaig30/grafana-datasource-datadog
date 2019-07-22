@@ -19,6 +19,10 @@
         <label class="gf-form-label query-keyword width-7">POST</label>
         <metric-segment segment="ctrl.asSegment" get-options="ctrl.getAs()" on-change="ctrl.asChanged()"></metric-segment>
       </div>
+      <div class="gf-form">
+        <label class="gf-form-label query-keyword width-7">GROUP BY</label>
+        <metric-segment segment="ctrl.asSegment" get-options="ctrl.getGroupBy()" on-change="ctrl.groupBy()"></metric-segment>
+      </div>
 
       <div class="gf-form gf-form--grow">
         <div class="gf-form-label gf-form-label--grow"></div>

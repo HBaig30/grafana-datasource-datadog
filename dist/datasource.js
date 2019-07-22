@@ -160,6 +160,17 @@ System.register(['lodash', './showdown.min.js', './query_builder'], function (_e
           value: function metricFindQuery(query) {
             var _this = this;
 
+            /* console.log("this.type: " + this.type);
+            console.log("this.url: " + this.url);
+            console.log("this.name: " + this.name);
+            console.log("this.api_key: " + this.api_key);
+            console.log("this.application_key: " + this.application_key);
+            console.log("this.supportMetrics: " + this.supportMetrics);
+            console.log("this.backendSrv: " + this.backendSrv);
+            console.log("this.templateSrv: " + this.templateSrv);
+            console.log("this._cached_metrics: " + this._cached_metrics);
+            console.log("this.has_begun: " + this.has_begun); */
+
             console.log("inside metricFindQuery(). query: " + query);
 
             //console.log("query inside metricFindQuery: " + query);
@@ -168,11 +179,16 @@ System.register(['lodash', './showdown.min.js', './query_builder'], function (_e
             // var has_begun = false;
             //export {has_begun};
 
-            if (this.has_begun === false) {
-              this.has_begun = true;
 
-              return 69;
-            }
+            /* if(this.has_begun === false) {
+              this.has_begun = true;
+               return 69;
+            } */
+
+            /*  if(this._cached_metrics != false) {
+               this.has_begun = false;
+               return 70;
+             } */
             //console.log("this.has_begun:  " + this.has_begun);
 
             if (this.has_begun === true) {
@@ -220,6 +236,13 @@ System.register(['lodash', './showdown.min.js', './query_builder'], function (_e
                 };
               });
             });
+          }
+        }, {
+          key: 'getGroupBy',
+          value: function getGroupBy() {
+            //var params = "system.disk.directory.files";
+            //var test = this.invokeDataDogApiRequest('/tags', params);
+            console.log("test:::::   " + test);
           }
         }, {
           key: 'getTagValues',

@@ -35,7 +35,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-//import {has_begun} from './datasource.js'
+//import {has_begun_global} from './datasource.js'
 
 var DataDogQueryCtrl = exports.DataDogQueryCtrl = function (_QueryCtrl) {
   _inherits(DataDogQueryCtrl, _QueryCtrl);
@@ -103,9 +103,8 @@ var DataDogQueryCtrl = exports.DataDogQueryCtrl = function (_QueryCtrl) {
     value: function getMetrics() {
 
       //console.log("TEST::::: " + this.datasource.metricFindQuery());
-      if (this.datasource.metricFindQuery() == 69) {
-        console.log("INSIDE IF STATEMENT");
-        //has_begun = false;
+
+      if (this.datasource.metricFindQuery() == 69 || this.datasource.metricFindQuery() == 70) {
         return;
       } else {
         return this.datasource.metricFindQuery().then(this.uiSegmentSrv.transformToSegments(true));
@@ -159,6 +158,11 @@ var DataDogQueryCtrl = exports.DataDogQueryCtrl = function (_QueryCtrl) {
         this.target.as = this.asSegment.value;
       }
       this.panelCtrl.refresh();
+    }
+  }, {
+    key: 'groupBy',
+    value: function groupBy() {
+      console.log("hello world lol");
     }
   }, {
     key: 'fixTagSegments',
