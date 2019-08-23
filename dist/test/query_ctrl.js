@@ -3,7 +3,9 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DataDogQueryCtrl = undefined;
+exports.DataDogQueryCtrl = exports.globSet = undefined;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -35,7 +37,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-//import {has_begun_global} from './datasource.js'
+var globSet = exports.globSet = [];
 
 var DataDogQueryCtrl = exports.DataDogQueryCtrl = function (_QueryCtrl) {
   _inherits(DataDogQueryCtrl, _QueryCtrl);
@@ -63,6 +65,15 @@ var DataDogQueryCtrl = exports.DataDogQueryCtrl = function (_QueryCtrl) {
     } else {
       _this.metricSegment = new uiSegmentSrv.newSegment({
         value: 'Select Metric',
+        fake: true,
+        custom: false
+      });
+    }
+    if (_this.target.groupBy) {
+      _this.groupBySegment = new uiSegmentSrv.SegmentSrv.newSegment(_this.target.groupBySegment);
+    } else {
+      _this.groupBySegment = new uiSegmentSrv.newSegment({
+        value: 'Group By',
         fake: true,
         custom: false
       });
@@ -101,14 +112,8 @@ var DataDogQueryCtrl = exports.DataDogQueryCtrl = function (_QueryCtrl) {
   }, {
     key: 'getMetrics',
     value: function getMetrics() {
-
-      //console.log("TEST::::: " + this.datasource.metricFindQuery());
-
-      if (this.datasource.metricFindQuery() == 69 || this.datasource.metricFindQuery() == 70) {
-        return;
-      } else {
-        return this.datasource.metricFindQuery().then(this.uiSegmentSrv.transformToSegments(true));
-      }
+      console.log("CONSTRUCTOR VALUE::::: " + JSON.stringify(this.metricSegment));
+      return this.datasource.metricFindQuery().then(this.uiSegmentSrv.transformToSegments(true));
     }
   }, {
     key: 'getAggregations',
@@ -125,12 +130,17 @@ var DataDogQueryCtrl = exports.DataDogQueryCtrl = function (_QueryCtrl) {
     value: function getTags(segment) {
       var _this2 = this;
 
+      console.log("INSIDE GET TAGS");
       return this.datasource.tagFindQuery().then(this.uiSegmentSrv.transformToSegments(true)).then(function (results) {
         if (segment.type !== 'plus-button') {
           var removeSegment = _this2.uiSegmentSrv.newFake(_this2.removeText);
           results.unshift(removeSegment);
         }
+        for (var i = 0; i < results.length; i++) {
+          globSet.push(JSON.stringify(results[i].text).split(":")[0].replace('"', '').trim());
+        }
 
+        console.log(globSet);
         return results;
       });
     }
@@ -160,9 +170,21 @@ var DataDogQueryCtrl = exports.DataDogQueryCtrl = function (_QueryCtrl) {
       this.panelCtrl.refresh();
     }
   }, {
-    key: 'groupBy',
-    value: function groupBy() {
-      console.log("hello world lol");
+    key: 'groupByChanged',
+    value: function groupByChanged(paramSegment) {
+      //console.log("this.getTags:::::" + JSON.stringify(this.datasource.tagFindQuery().then(this.uiSegmentSrv.transformToSegments(true))));
+
+      console.log(this.datasource);
+      //return this.datasource.groupByDatasource();
+
+      //return this.getTags(paramSegment);
+    }
+  }, {
+    key: 'groupByUpdated',
+    value: function groupByUpdated(paramSegmentNew, indexNew) {
+      console.log("THIS IS THE TYPE OF GROUPBYUPDATED::::::::::::::::::" + _typeof(this.tagSegmentUpdated(paramSegmentNew, indexNew)));
+
+      return this.tagSegmentUpdated(paramSegmentNew, indexNew);
     }
   }, {
     key: 'fixTagSegments',
@@ -211,6 +233,7 @@ var DataDogQueryCtrl = exports.DataDogQueryCtrl = function (_QueryCtrl) {
   }, {
     key: 'tagSegmentUpdated',
     value: function tagSegmentUpdated(segment, index) {
+
       if (segment.value === this.removeText) {
         this.tagSegments.splice(index, 1);
       }

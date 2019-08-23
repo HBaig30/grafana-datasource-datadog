@@ -19,9 +19,9 @@
         <label class="gf-form-label query-keyword width-7">POST</label>
         <metric-segment segment="ctrl.asSegment" get-options="ctrl.getAs()" on-change="ctrl.asChanged()"></metric-segment>
       </div>
-      <div class="gf-form">
+      <div class="gf-form" ng-repeat="segment in ctrl.tagSegments">
         <label class="gf-form-label query-keyword width-7">GROUP BY</label>
-        <metric-segment segment="ctrl.asSegment" get-options="ctrl.getGroupBy()" on-change="ctrl.groupBy()"></metric-segment>
+        <metric-segment segment="ctrl.groupBySegment" get-options="ctrl.groupByChanged(segment, $index)" on-change="ctrl.groupByUpdated(segment, $index)"></metric-segment>
       </div>
 
       <div class="gf-form gf-form--grow">

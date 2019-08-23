@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import dfunc from './dfunc';
+import {globSet} from './query_ctrl';
 
-export function buildQuery(target, adhocFilters) {
+export function buildQuery(target, adhocFilters,groupByOptions) {
   let {aggregation, metric, tags, functions} = target;
   let query = `${aggregation}:${metric}`;
 
@@ -25,6 +26,13 @@ export function buildQuery(target, adhocFilters) {
     query += '}';
   } else {
     query += '{*}';
+
+    if (globSet && globSet.length) {
+      query += ' by ';
+      query += '{';
+      query += globSet;
+      query += '}';
+    }
   }
 
   if (target.as) {

@@ -13,9 +13,11 @@ var _dfunc = require('./dfunc');
 
 var _dfunc2 = _interopRequireDefault(_dfunc);
 
+var _query_ctrl = require('./query_ctrl');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function buildQuery(target, adhocFilters) {
+function buildQuery(target, adhocFilters, groupByOptions) {
   var aggregation = target.aggregation,
       metric = target.metric,
       tags = target.tags,
@@ -43,6 +45,13 @@ function buildQuery(target, adhocFilters) {
     query += '}';
   } else {
     query += '{*}';
+
+    if (_query_ctrl.globSet && _query_ctrl.globSet.length) {
+      query += ' by ';
+      query += '{';
+      query += _query_ctrl.globSet;
+      query += '}';
+    }
   }
 
   if (target.as) {

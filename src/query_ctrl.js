@@ -4,7 +4,10 @@ import {QueryCtrl} from 'app/plugins/sdk';
 import './func_editor';
 import './add_datadog_func';
 import * as queryBuilder from './query_builder';
-//import {has_begun_global} from './datasource.js'
+
+
+export var globSet = [];
+
 
 export class DataDogQueryCtrl extends QueryCtrl {
 
@@ -29,9 +32,22 @@ export class DataDogQueryCtrl extends QueryCtrl {
       this.metricSegment = new uiSegmentSrv.newSegment(
         this.target.metric
       );
-    } else {
+
+    }
+    else {
       this.metricSegment = new uiSegmentSrv.newSegment({
         value: 'Select Metric',
+        fake: true,
+        custom: false,
+      });
+    }
+    if(this.target.groupBy) {
+      this.groupBySegment = new uiSegmentSrv.SegmentSrv.newSegment(
+        this.target.groupBySegment
+      );
+    } else {
+      this.groupBySegment = new uiSegmentSrv.newSegment({
+        value: 'Group By',
         fake: true,
         custom: false,
       });
@@ -66,16 +82,9 @@ export class DataDogQueryCtrl extends QueryCtrl {
   }
 
   getMetrics() {
-
-    //console.log("TEST::::: " + this.datasource.metricFindQuery());
-
-    if(this.datasource.metricFindQuery() == 69 || this.datasource.metricFindQuery() == 70) {
-      return;
-    }
-    else{
+    console.log("CONSTRUCTOR VALUE::::: " + JSON.stringify(this.metricSegment));
     return this.datasource.metricFindQuery()
     .then(this.uiSegmentSrv.transformToSegments(true));
-    }
   }
 
   getAggregations() {
@@ -95,7 +104,10 @@ export class DataDogQueryCtrl extends QueryCtrl {
     ]);
   }
 
+
+
   getTags(segment) {
+    console.log("INSIDE GET TAGS");
     return this.datasource.tagFindQuery()
     .then(this.uiSegmentSrv.transformToSegments(true))
     .then(results => {
@@ -103,7 +115,11 @@ export class DataDogQueryCtrl extends QueryCtrl {
         let removeSegment = this.uiSegmentSrv.newFake(this.removeText);
         results.unshift(removeSegment);
       }
+        for (var i = 0; i < results.length; i++) {
+          globSet.push(JSON.stringify(results[i].text).split(":")[0].replace('"','').trim());
+        }
 
+      console.log(globSet);
       return results;
     });
   }
@@ -131,9 +147,20 @@ export class DataDogQueryCtrl extends QueryCtrl {
     this.panelCtrl.refresh();
   }
 
-  groupBy() {
-    console.log("hello world lol");
+  groupByChanged(paramSegment) {
+    //console.log("this.getTags:::::" + JSON.stringify(this.datasource.tagFindQuery().then(this.uiSegmentSrv.transformToSegments(true))));
 
+    console.log(this.datasource);
+    //return this.datasource.groupByDatasource();
+
+    //return this.getTags(paramSegment);
+  }
+
+
+  groupByUpdated(paramSegmentNew,indexNew) {
+    console.log ("THIS IS THE TYPE OF GROUPBYUPDATED::::::::::::::::::" + typeof this.tagSegmentUpdated(paramSegmentNew,indexNew));
+
+    return this.tagSegmentUpdated(paramSegmentNew,indexNew);
   }
 
   fixTagSegments() {
@@ -176,8 +203,10 @@ export class DataDogQueryCtrl extends QueryCtrl {
   }
 
   tagSegmentUpdated(segment, index) {
+
     if (segment.value === this.removeText) {
       this.tagSegments.splice(index, 1);
+
     }
 
     let realSegments = _.filter(this.tagSegments, segment => segment.value);

@@ -160,64 +160,32 @@ System.register(['lodash', './showdown.min.js', './query_builder'], function (_e
           value: function metricFindQuery(query) {
             var _this = this;
 
-            /* console.log("this.type: " + this.type);
-            console.log("this.url: " + this.url);
-            console.log("this.name: " + this.name);
-            console.log("this.api_key: " + this.api_key);
-            console.log("this.application_key: " + this.application_key);
-            console.log("this.supportMetrics: " + this.supportMetrics);
-            console.log("this.backendSrv: " + this.backendSrv);
-            console.log("this.templateSrv: " + this.templateSrv);
-            console.log("this._cached_metrics: " + this._cached_metrics);
-            console.log("this.has_begun: " + this.has_begun); */
-
-            console.log("inside metricFindQuery(). query: " + query);
-
-            //console.log("query inside metricFindQuery: " + query);
-            //console.log("newTEST::::::" + this.fetching);
-
-            // var has_begun = false;
-            //export {has_begun};
-
-
-            /* if(this.has_begun === false) {
-              this.has_begun = true;
-               return 69;
-            } */
-
-            /*  if(this._cached_metrics != false) {
-               this.has_begun = false;
-               return 70;
-             } */
-            //console.log("this.has_begun:  " + this.has_begun);
-
-            if (this.has_begun === true) {
-              if (query === 'tag') {
-                return this.tagFindQuery();
-              }
-
-              if (this._cached_metrics) {
-                return Promise.resolve(this._cached_metrics);
-              }
-
-              if (this.fetching) {
-                return this.fetching;
-              }
-              var d = new Date();
-              d.setDate(d.getDate() - 1);
-              var from = Math.floor(d.getTime() / 1000);
-              this.fetching = this.getMetrics(from).then(function (metrics) {
-                _this._cached_metrics = _.map(metrics, function (metric) {
-                  //console.log("this.fetching: " +this.fetching[0]);
-                  return {
-                    text: metric,
-                    value: metric
-                  };
-                });
-                //this._cached_metrics = this._cached_metrics.slice(0,10);
-                return _this._cached_metrics;
-              });
+            if (query === 'tag') {
+              return this.tagFindQuery();
             }
+
+            if (this._cached_metrics) {
+              return Promise.resolve(this._cached_metrics);
+            }
+
+            if (this.fetching) {
+              return this.fetching;
+            }
+            var d = new Date();
+            d.setDate(d.getDate() - 1);
+            var from = Math.floor(d.getTime() / 1000);
+            this.fetching = this.getMetrics(from).then(function (metrics) {
+              _this._cached_metrics = _.map(metrics, function (metric) {
+                return {
+                  text: metric,
+                  value: metric
+                };
+              });
+
+              //this._cached_metrics = this._cached_metrics.slice(0,10);
+              return _this._cached_metrics;
+            });
+
             return this.fetching;
           }
         }, {
@@ -242,7 +210,8 @@ System.register(['lodash', './showdown.min.js', './query_builder'], function (_e
           value: function getGroupBy() {
             //var params = "system.disk.directory.files";
             //var test = this.invokeDataDogApiRequest('/tags', params);
-            console.log("test:::::   " + test);
+
+
           }
         }, {
           key: 'getTagValues',
@@ -299,9 +268,9 @@ System.register(['lodash', './showdown.min.js', './query_builder'], function (_e
 
             return this.invokeDataDogApiRequest('/query', params).then(function (result) {
               var dataResponse = _.map(result.series, function (series, i) {
-                var target = targets[i];
+
                 return {
-                  'target': target.alias || series.expression,
+                  'target': series.expression,
                   'datapoints': _.map(series.pointlist, function (point) {
                     return [point[1], point[0]];
                   })

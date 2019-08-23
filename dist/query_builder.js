@@ -1,11 +1,11 @@
 'use strict';
 
-System.register(['lodash', './dfunc'], function (_export, _context) {
+System.register(['lodash', './dfunc', './query_ctrl'], function (_export, _context) {
   "use strict";
 
-  var _, dfunc;
+  var _, dfunc, globSet;
 
-  function buildQuery(target, adhocFilters) {
+  function buildQuery(target, adhocFilters, groupByOptions) {
     var aggregation = target.aggregation,
         metric = target.metric,
         tags = target.tags,
@@ -33,6 +33,13 @@ System.register(['lodash', './dfunc'], function (_export, _context) {
       query += '}';
     } else {
       query += '{*}';
+
+      if (globSet && globSet.length) {
+        query += ' by ';
+        query += '{';
+        query += globSet;
+        query += '}';
+      }
     }
 
     if (target.as) {
@@ -78,6 +85,8 @@ System.register(['lodash', './dfunc'], function (_export, _context) {
       _ = _lodash.default;
     }, function (_dfunc) {
       dfunc = _dfunc.default;
+    }, function (_query_ctrl) {
+      globSet = _query_ctrl.globSet;
     }],
     execute: function () {}
   };

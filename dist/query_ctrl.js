@@ -3,7 +3,7 @@
 System.register(['lodash', './dfunc', 'app/plugins/sdk', './func_editor', './add_datadog_func', './query_builder'], function (_export, _context) {
   "use strict";
 
-  var _, dfunc, QueryCtrl, queryBuilder, _createClass, DataDogQueryCtrl;
+  var _, dfunc, QueryCtrl, queryBuilder, _typeof, _createClass, globSet, DataDogQueryCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -46,6 +46,12 @@ System.register(['lodash', './dfunc', 'app/plugins/sdk', './func_editor', './add
       queryBuilder = _query_builder;
     }],
     execute: function () {
+      _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+        return typeof obj;
+      } : function (obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+      };
+
       _createClass = function () {
         function defineProperties(target, props) {
           for (var i = 0; i < props.length; i++) {
@@ -63,6 +69,10 @@ System.register(['lodash', './dfunc', 'app/plugins/sdk', './func_editor', './add
           return Constructor;
         };
       }();
+
+      _export('globSet', globSet = []);
+
+      _export('globSet', globSet);
 
       _export('DataDogQueryCtrl', DataDogQueryCtrl = function (_QueryCtrl) {
         _inherits(DataDogQueryCtrl, _QueryCtrl);
@@ -90,6 +100,15 @@ System.register(['lodash', './dfunc', 'app/plugins/sdk', './func_editor', './add
           } else {
             _this.metricSegment = new uiSegmentSrv.newSegment({
               value: 'Select Metric',
+              fake: true,
+              custom: false
+            });
+          }
+          if (_this.target.groupBy) {
+            _this.groupBySegment = new uiSegmentSrv.SegmentSrv.newSegment(_this.target.groupBySegment);
+          } else {
+            _this.groupBySegment = new uiSegmentSrv.newSegment({
+              value: 'Group By',
               fake: true,
               custom: false
             });
@@ -128,14 +147,8 @@ System.register(['lodash', './dfunc', 'app/plugins/sdk', './func_editor', './add
         }, {
           key: 'getMetrics',
           value: function getMetrics() {
-
-            //console.log("TEST::::: " + this.datasource.metricFindQuery());
-
-            if (this.datasource.metricFindQuery() == 69 || this.datasource.metricFindQuery() == 70) {
-              return;
-            } else {
-              return this.datasource.metricFindQuery().then(this.uiSegmentSrv.transformToSegments(true));
-            }
+            console.log("CONSTRUCTOR VALUE::::: " + JSON.stringify(this.metricSegment));
+            return this.datasource.metricFindQuery().then(this.uiSegmentSrv.transformToSegments(true));
           }
         }, {
           key: 'getAggregations',
@@ -152,12 +165,17 @@ System.register(['lodash', './dfunc', 'app/plugins/sdk', './func_editor', './add
           value: function getTags(segment) {
             var _this2 = this;
 
+            console.log("INSIDE GET TAGS");
             return this.datasource.tagFindQuery().then(this.uiSegmentSrv.transformToSegments(true)).then(function (results) {
               if (segment.type !== 'plus-button') {
                 var removeSegment = _this2.uiSegmentSrv.newFake(_this2.removeText);
                 results.unshift(removeSegment);
               }
+              for (var i = 0; i < results.length; i++) {
+                globSet.push(JSON.stringify(results[i].text).split(":")[0].replace('"', '').trim());
+              }
 
+              console.log(globSet);
               return results;
             });
           }
@@ -187,9 +205,21 @@ System.register(['lodash', './dfunc', 'app/plugins/sdk', './func_editor', './add
             this.panelCtrl.refresh();
           }
         }, {
-          key: 'groupBy',
-          value: function groupBy() {
-            console.log("hello world lol");
+          key: 'groupByChanged',
+          value: function groupByChanged(paramSegment) {
+            //console.log("this.getTags:::::" + JSON.stringify(this.datasource.tagFindQuery().then(this.uiSegmentSrv.transformToSegments(true))));
+
+            console.log(this.datasource);
+            //return this.datasource.groupByDatasource();
+
+            //return this.getTags(paramSegment);
+          }
+        }, {
+          key: 'groupByUpdated',
+          value: function groupByUpdated(paramSegmentNew, indexNew) {
+            console.log("THIS IS THE TYPE OF GROUPBYUPDATED::::::::::::::::::" + _typeof(this.tagSegmentUpdated(paramSegmentNew, indexNew)));
+
+            return this.tagSegmentUpdated(paramSegmentNew, indexNew);
           }
         }, {
           key: 'fixTagSegments',
@@ -238,6 +268,7 @@ System.register(['lodash', './dfunc', 'app/plugins/sdk', './func_editor', './add
         }, {
           key: 'tagSegmentUpdated',
           value: function tagSegmentUpdated(segment, index) {
+
             if (segment.value === this.removeText) {
               this.tagSegments.splice(index, 1);
             }
